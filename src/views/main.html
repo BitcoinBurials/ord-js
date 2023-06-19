@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      <%= compilation.assets[htmlWebpackPlugin.files.css[0]].source() %>
+    </style>
+    <%= htmlWebpackPlugin.options.dependencies %>
+  </head>
+  <body>
+    <img src="/img/1.webp" width="500" height="500" />
+    <script>
+      <%= compilation.assets[htmlWebpackPlugin.files.js[0]].source() %>
+    </script>
+  </body>
+</html>
