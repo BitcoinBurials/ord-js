@@ -1,12 +1,21 @@
+const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-const { img, dependencies } = require("./ord.config");
+const { img, dependencies, script, styles } = require("./ord.config");
 
 const imgReplace = Object.entries(img).map(([key, value]) => ({
   search: `/img/${key}`,
+  replace: `/content/${value}`,
+}));
+const cssReplace = Object.entries(styles).map(([key, value]) => ({
+  search: `/${key}`,
+  replace: `/content/${value}`,
+}));
+const scriptReplace = Object.entries(script).map(([key, value]) => ({
+  search: `/${key}`,
   replace: `/content/${value}`,
 }));
 const productionDependencies = Object.values(dependencies)
@@ -28,10 +37,14 @@ module.exports = (env, argv) => {
         ...(isProduction
           ? [
               {
-                test: /\.pug$/,
+                test: /\.html$/,
+                loader: "raw-loader",
+              },
+              {
+                test: /\.html$/,
                 loader: "string-replace-loader",
                 options: {
-                  multiple: imgReplace,
+                  multiple: [...imgReplace, ...cssReplace, ...scriptReplace],
                 },
               },
             ]
@@ -44,10 +57,14 @@ module.exports = (env, argv) => {
         ? []
         : [
             new CopyPlugin({
-              patterns: [{ from: "./public", to: "./" }],
+              patterns: [
+                {
+                  from: path.join(__dirname, "public/img"),
+                  to: path.join(__dirname, "dist/img"),
+                },
+              ],
             }),
           ]),
-      new MiniCssExtractPlugin(),
       new HtmlWebpackPlugin({
         inject: false,
         cache: false,
@@ -55,15 +72,18 @@ module.exports = (env, argv) => {
         filename: "index.html",
         dependencies: isProduction ? productionDependencies : "",
       }),
+      new MiniCssExtractPlugin({ filename: "styles.css" }),
     ],
     optimization: {
       minimizer: [new CssMinimizerPlugin()],
+      minimize: true,
     },
     devServer: {
-      hot: "only",
+      hot: true,
       static: {
-        directory: "./dist",
+        directory: path.join(__dirname, "dist"),
       },
+      port: 3000,
     },
   };
 };

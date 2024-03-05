@@ -2,15 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <style>
-      <%= compilation.assets[htmlWebpackPlugin.files.css[0]].source() %>
-    </style>
-    <%= htmlWebpackPlugin.options.dependencies %>
+    <link href="/styles.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
     <img src="/img/1.webp" width="500" height="500" />
-    <script>
-      <%= compilation.assets[htmlWebpackPlugin.files.js[0]].source() %>
-    </script>
+    <img src="/img/logo.png" width="500" />
+    <script src="/main.js" defer></script>
   </body>
 </html>
