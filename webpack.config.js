@@ -83,6 +83,7 @@ module.exports = (env, argv) => {
       static: {
         directory: path.join(__dirname, "dist"),
       },
+      watchFiles: ["public/**/*", "src/**/*"],
       port: 3000,
     },
   };
