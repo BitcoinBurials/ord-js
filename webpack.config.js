@@ -3,9 +3,11 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const { img, dependencies, script, styles } = require("./ord.config");
 
+const DEV_BASE_RECURSION_URL = "https://ordinals.com";
 const imgReplace = Object.entries(img).map(([key, value]) => ({
   search: `/img/${key}`,
   replace: `/content/${value}`,
@@ -41,10 +43,15 @@ module.exports = (env, argv) => {
                 loader: "raw-loader",
               },
               {
-                test: /\.html$/,
+                test: /\.html|.js$/,
                 loader: "string-replace-loader",
                 options: {
-                  multiple: [...imgReplace, ...cssReplace, ...scriptReplace],
+                  multiple: [
+                    ...imgReplace,
+                    ...cssReplace,
+                    ...scriptReplace,
+                    { search: DEV_BASE_RECURSION_URL, replace: "" },
+                  ],
                 },
               },
             ]
@@ -75,7 +82,7 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({ filename: "styles.css" }),
     ],
     optimization: {
-      minimizer: [new CssMinimizerPlugin()],
+      minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],
       minimize: true,
     },
     devServer: {
